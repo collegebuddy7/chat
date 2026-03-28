@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CB Admin</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 20px; }
+    input, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    button { background: #6BBF4E; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    #msg { margin-top: 12px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>📣 Send Broadcast</h2>
+  <label>Admin Key</label>
+  <input type="password" id="key" placeholder="Your admin key"/>
+  <label>Title</label>
+  <input type="text" id="title" placeholder="e.g. Important Announcement"/>
+  <label>Message</label>
+  <textarea id="body" rows="5" placeholder="Your broadcast message…"></textarea>
+  <button onclick="send()">Send Broadcast</button>
+  <div id="msg"></div>
+
+  <script>
+    const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // same URL as index.html
+
+    async function send() {
+      const key   = document.getElementById('key').value;
+      const title = document.getElementById('title').value.trim();
+      const body  = document.getElementById('body').value.trim();
+      const msg   = document.getElementById('msg');
+      if (!key || !title || !body) { msg.textContent = '⚠ Fill all fields.'; msg.style.color='red'; return; }
+      msg.textContent = 'Sending…'; msg.style.color = '#888';
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action:'broadcast', adminKey: key, title, body })
+      });
+      const data = await res.json();
+      if (data.ok) { msg.textContent = '✅ Broadcast sent!'; msg.style.color='green'; document.getElementById('body').value=''; document.getElementById('title').value=''; }
+      else { msg.textContent = '❌ ' + data.error; msg.style.color='red'; }
+    }
+  </script>
+</body>
+</html>

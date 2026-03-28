@@ -555,16 +555,29 @@ async function loadAll() {
 //  USERS
 // ════════════════════════════════════════════════════
 async function loadUsers() {
+  document.getElementById('search-results').innerHTML = `
+    <div class="empty-state">
+      <div class="spinner"></div>
+      <p style="margin-top:8px">Loading users…</p>
+    </div>`;
   try {
     const res = await api({ action:'getUsers' });
     if (res.ok) { allUsers = res.users; renderSearch(); }
-  } catch(e) {}
+  } catch(e) {
+    document.getElementById('search-results').innerHTML = `
+      <div class="empty-state"><div class="em">😕</div><p>Failed to load users.</p></div>`;
+  }
 }
 
 // ════════════════════════════════════════════════════
 //  CHATS
 // ════════════════════════════════════════════════════
 async function loadChats() {
+  document.getElementById('chat-list').innerHTML = `
+    <div class="empty-state">
+      <div class="spinner"></div>
+      <p style="margin-top:8px">Loading chats…</p>
+    </div>`;
   try {
     const res = await api({ action:'getChats', userNumber: currentUser.number });
     if (res.ok) renderChatList(res.chats);
@@ -626,6 +639,14 @@ function closeChat() {
 
 async function fetchMessages() {
   if (!chatPartner) return;
+  const container = document.getElementById('cw-msgs');
+  if (!container.children.length) {
+    container.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;opacity:.6">
+        <div class="spinner"></div>
+        <p style="font-size:.8rem;color:var(--muted)">Loading messages…</p>
+      </div>`;
+  }
   try {
     const res = await api({
       action: 'getMessages',
@@ -706,6 +727,11 @@ function autoResize(el) {
 //  BROADCASTS
 // ════════════════════════════════════════════════════
 async function loadBroadcasts() {
+  document.getElementById('updates-list').innerHTML = `
+    <div class="empty-state">
+      <div class="spinner"></div>
+      <p style="margin-top:8px">Loading updates…</p>
+    </div>`;
   try {
     const res = await api({ action:'getBroadcasts' });
     if (res.ok) renderBroadcasts(res.broadcasts);
